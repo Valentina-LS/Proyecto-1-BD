@@ -1,10 +1,4 @@
-"""
-Interfaz grafica sencilla para el sistema de empresas.
-
-- Usa tkinter (incluido en Python, sin dependencias externas).
-- Fondo blanco y texto negro.
-- Permite CRUD e importacion/exportacion con separador '|'.
-"""
+"""Interfaz grafica tkinter para CRUD de empresas."""
 
 from __future__ import annotations
 
@@ -15,7 +9,10 @@ from sistema_empresas import Empresa, GestorEmpresas
 
 
 class SistemaEmpresasGUI:
+    """Controla la interfaz grafica y conecta acciones con el gestor CRUD."""
+
     def __init__(self, root: tk.Tk) -> None:
+        """Inicializa ventana, estado y widgets principales."""
         self.root = root
         self.root.title("Sistema de Empresas - GUI")
         self.root.geometry("900x600")
@@ -23,7 +20,6 @@ class SistemaEmpresasGUI:
 
         self.gestor = GestorEmpresas()
 
-        # Variables enlazadas a los campos del formulario.
         self.var_nit = tk.StringVar()
         self.var_nombre = tk.StringVar()
         self.var_direccion = tk.StringVar()
@@ -32,6 +28,7 @@ class SistemaEmpresasGUI:
         self._construir_interfaz()
 
     def _construir_interfaz(self) -> None:
+        """Crea layout, campos, botones y area de salida."""
         titulo = tk.Label(
             self.root,
             text="Sistema de Empresas (Enfoque Educativo)",
@@ -103,6 +100,7 @@ class SistemaEmpresasGUI:
         self.txt_salida.pack(fill="both", expand=True, pady=5)
 
     def _crear_campo(self, contenedor: tk.Frame, etiqueta: str, variable: tk.StringVar, fila: int) -> None:
+        """Crea una fila de etiqueta + entrada para el formulario."""
         lbl = tk.Label(contenedor, text=etiqueta + ":", bg="white", fg="black", anchor="w")
         lbl.grid(row=fila, column=0, sticky="w", padx=5, pady=4)
 
@@ -119,6 +117,7 @@ class SistemaEmpresasGUI:
         ent.grid(row=fila, column=1, sticky="w", padx=5, pady=4)
 
     def _leer_formulario(self) -> tuple[str, str, str, float] | None:
+        """Lee y valida campos del formulario."""
         nit = self.var_nit.get().strip()
         nombre = self.var_nombre.get().strip()
         direccion = self.var_direccion.get().strip()
@@ -137,10 +136,12 @@ class SistemaEmpresasGUI:
         return nit, nombre, direccion, presupuesto
 
     def _mostrar(self, texto: str) -> None:
+        """Reemplaza el contenido del area de salida."""
         self.txt_salida.delete("1.0", tk.END)
         self.txt_salida.insert(tk.END, texto)
 
     def adicionar(self) -> None:
+        """Agrega una empresa nueva desde el formulario."""
         datos = self._leer_formulario()
         if not datos:
             return
@@ -154,6 +155,7 @@ class SistemaEmpresasGUI:
             self._mostrar("No se pudo adicionar: ya existe una empresa con ese NIT.")
 
     def consultar(self) -> None:
+        """Consulta una empresa por NIT y la muestra en pantalla."""
         nit = self.var_nit.get().strip()
         if not nit:
             messagebox.showerror("Error", "Ingrese el NIT para consultar.")
@@ -173,6 +175,7 @@ class SistemaEmpresasGUI:
         self._mostrar(texto)
 
     def actualizar(self) -> None:
+        """Actualiza una empresa existente por NIT."""
         datos = self._leer_formulario()
         if not datos:
             return
@@ -184,6 +187,7 @@ class SistemaEmpresasGUI:
             self._mostrar("No se encontro una empresa con ese NIT.")
 
     def eliminar(self) -> None:
+        """Elimina una empresa por NIT."""
         nit = self.var_nit.get().strip()
         if not nit:
             messagebox.showerror("Error", "Ingrese el NIT para eliminar.")
@@ -195,6 +199,7 @@ class SistemaEmpresasGUI:
             self._mostrar("No se encontro una empresa con ese NIT.")
 
     def listar(self) -> None:
+        """Lista todas las empresas registradas."""
         empresas = self.gestor.listar()
         if not empresas:
             self._mostrar("No hay empresas registradas.")
@@ -213,6 +218,7 @@ class SistemaEmpresasGUI:
         self._mostrar("\n".join(lineas))
 
     def importar_csv(self) -> None:
+        """Importa empresas desde archivo CSV con delimitador '|'."""
         ruta = filedialog.askopenfilename(
             title="Seleccionar archivo para importar",
             filetypes=[("Archivos CSV", "*.csv"), ("Todos los archivos", "*.*")],
@@ -229,6 +235,7 @@ class SistemaEmpresasGUI:
             messagebox.showerror("Error", f"No se pudo importar el archivo: {exc}")
 
     def exportar_csv(self) -> None:
+        """Exporta las empresas actuales a un archivo CSV."""
         ruta = filedialog.asksaveasfilename(
             title="Guardar archivo de exportacion",
             defaultextension=".csv",
@@ -244,6 +251,7 @@ class SistemaEmpresasGUI:
             messagebox.showerror("Error", f"No se pudo exportar el archivo: {exc}")
 
     def limpiar_campos(self) -> None:
+        """Limpia los campos del formulario y la salida."""
         self.var_nit.set("")
         self.var_nombre.set("")
         self.var_direccion.set("")
@@ -252,6 +260,7 @@ class SistemaEmpresasGUI:
 
 
 def main() -> None:
+    """Punto de entrada de la aplicacion grafica."""
     root = tk.Tk()
     app = SistemaEmpresasGUI(root)
     root.mainloop()

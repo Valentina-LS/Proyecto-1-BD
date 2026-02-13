@@ -1,23 +1,4 @@
-"""
-Programa educativo de Base de Datos (simulacion CRUD de empresas).
-
-Objetivo:
-- Practicar operaciones basicas tipo base de datos sin instalar dependencias externas.
-- Manejar estructuras de datos en memoria.
-- Importar y exportar archivos con formato CSV personalizado.
-
-Formato de datos requerido por el proyecto (orden obligatorio de columnas):
-1) nit
-2) nombre_empresa
-3) direccion
-4) presupuesto_anual
-
-Separador de campos: |
-Separador de registros: salto de linea (enter)
-
-Ejemplo de linea valida:
-900123456|Mi Empresa S.A.S|Calle 10 # 20-30|35000000.5
-"""
+"""Sistema educativo CRUD de empresas con importacion/exportacion CSV ('|')."""
 
 from __future__ import annotations
 
@@ -26,10 +7,10 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-# La clase Empresa representa un registro de nuestra "tabla" empresa.
-# Usamos @dataclass para reducir codigo repetitivo y mantenerlo claro.
 @dataclass
 class Empresa:
+    """Representa un registro de empresa."""
+
     nit: str
     nombre_empresa: str
     direccion: str
@@ -37,12 +18,7 @@ class Empresa:
 
 
 class GestorEmpresas:
-    """
-    Esta clase centraliza toda la logica CRUD sobre una lista en memoria.
-
-    En una base de datos real tendriamos tablas y sentencias SQL.
-    Aqui usamos una lista para fines educativos.
-    """
+    """Administra las operaciones CRUD sobre empresas en memoria."""
 
     def __init__(self) -> None:
         self.empresas: list[Empresa] = []
@@ -55,20 +31,14 @@ class GestorEmpresas:
         return None
 
     def adicionar(self, empresa: Empresa) -> bool:
-        """
-        Inserta un nuevo registro.
-        Retorna True si se inserto, False si el NIT ya existe.
-        """
+        """Inserta una empresa si el NIT no existe."""
         if self.buscar_por_nit(empresa.nit):
             return False
         self.empresas.append(empresa)
         return True
 
     def eliminar(self, nit: str) -> bool:
-        """
-        Elimina por NIT.
-        Retorna True si elimino, False si no encontro el registro.
-        """
+        """Elimina una empresa por NIT."""
         empresa = self.buscar_por_nit(nit)
         if not empresa:
             return False
@@ -80,10 +50,7 @@ class GestorEmpresas:
         return self.buscar_por_nit(nit)
 
     def actualizar(self, nit: str, nombre: str, direccion: str, presupuesto: float) -> bool:
-        """
-        Actualiza los datos de una empresa existente por NIT.
-        Retorna True si actualizo, False si no encontro el registro.
-        """
+        """Actualiza nombre, direccion y presupuesto por NIT."""
         empresa = self.buscar_por_nit(nit)
         if not empresa:
             return False
@@ -98,15 +65,7 @@ class GestorEmpresas:
         return self.empresas
 
     def exportar_csv(self, ruta_archivo: str) -> None:
-        """
-        Exporta registros al formato pedido:
-        nit|nombre_empresa|direccion|presupuesto_anual
-
-        Importante:
-        - Usamos delimitador '|'.
-        - Cada empresa en una nueva linea (enter).
-        - Se conserva el orden de columnas solicitado.
-        """
+        """Exporta empresas a CSV con formato: nit|nombre|direccion|presupuesto."""
         ruta = Path(ruta_archivo)
         with ruta.open(mode="w", newline="", encoding="utf-8") as archivo:
             escritor = csv.writer(archivo, delimiter="|", lineterminator="\n")
@@ -114,16 +73,7 @@ class GestorEmpresas:
                 escritor.writerow([e.nit, e.nombre_empresa, e.direccion, e.presupuesto_anual])
 
     def importar_csv(self, ruta_archivo: str) -> tuple[int, int]:
-        """
-        Importa registros desde archivo con separador '|'.
-
-        Reglas aplicadas:
-        - Debe haber exactamente 4 columnas por linea.
-        - El presupuesto debe ser numerico.
-        - Si un NIT ya existe, se omite (evita duplicados).
-
-        Retorna: (registros_insertados, registros_omitidos)
-        """
+        """Importa CSV ('|') y retorna (insertados, omitidos)."""
         ruta = Path(ruta_archivo)
         insertados = 0
         omitidos = 0
@@ -132,7 +82,7 @@ class GestorEmpresas:
             lector = csv.reader(archivo, delimiter="|")
             for fila in lector:
                 if not fila:
-                    # Si hay linea vacia, se ignora.
+                    # Ignora lineas vacias.
                     continue
 
                 if len(fila) != 4:
@@ -167,7 +117,7 @@ class GestorEmpresas:
 
 
 def pedir_presupuesto() -> float:
-    """Solicita presupuesto y valida que sea numerico."""
+    """Solicita y valida presupuesto numerico."""
     while True:
         valor = input("Presupuesto anual: ").strip()
         try:
@@ -177,7 +127,7 @@ def pedir_presupuesto() -> float:
 
 
 def mostrar_empresa(e: Empresa) -> None:
-    """Imprime una empresa en formato legible."""
+    """Muestra en consola los datos de una empresa."""
     print(f"NIT: {e.nit}")
     print(f"Nombre empresa: {e.nombre_empresa}")
     print(f"Direccion: {e.direccion}")
@@ -185,7 +135,7 @@ def mostrar_empresa(e: Empresa) -> None:
 
 
 def menu() -> None:
-    """Menu principal del programa por consola."""
+    """Ejecuta el menu interactivo de la version por consola."""
     gestor = GestorEmpresas()
 
     while True:
